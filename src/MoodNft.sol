@@ -7,6 +7,7 @@ contract MoodNft is ERC721 {
     string private s_happyNftImage_uri;
     string private s_sadNftImage_uri;
     uint256 private s_tokenCounter;
+    error MoodNFT__NOT_APPRoVED_OR_OWNER();
     enum Mood {
         HAPPY,
         SAD
@@ -26,6 +27,20 @@ contract MoodNft is ERC721 {
         _safeMint(msg.sender, s_tokenCounter);
         s_tokenIdtoMood[s_tokenCounter] = Mood.HAPPY;
         s_tokenCounter++;
+    }
+
+    function flipMood(uint tokenId) public {
+        //only owner can flip mood
+        if (
+            getApproved(tokenId) != msg.sender && ownerOf(tokenId) != msg.sender
+        ) {
+            revert MoodNFT__NOT_APPRoVED_OR_OWNER();
+        }
+        if (s_tokenIdtoMood[tokenId] == Mood.HAPPY) {
+            s_tokenIdtoMood[tokenId] = Mood.SAD;
+        } else {
+            s_tokenIdtoMood[tokenId] = Mood.HAPPY;
+        }
     }
 
     function _baseURI() internal pure override returns (string memory) {
